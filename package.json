@@ -90,7 +90,7 @@
     "webpack-cli": "^5.0.0"
   },
   "dependencies": {
-    "buttplug": "^3.1.0",
+    "buttplug": "^3.1.1",
     "filereader": "^0.10.3",
     "ws": "^8.12.0"
   }
