@@ -57,6 +57,11 @@
           "type": "integer",
           "default": 10000,
           "description": "Duration (in milliseconds) of each stage of vibration"
+        },
+        "prohe.serverAddress": {
+          "type": "string",
+          "default": "ws://localhost:12345",
+          "description": "Intiface Central server address to connect to"
         }
       }
     }

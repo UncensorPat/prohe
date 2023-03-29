@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { ButtplugClient, ButtplugClientDevice, ButtplugNodeWebsocketClientConnector } from 'buttplug';
 
+const DEFAULT_SERVER_ADDRESS = "ws://localhost:12345";
 const DEFAULT_VIBRATION_TIMEOUT = 5000;
 const DEFAULT_VIBRATION_MAX = 0.5;
 const DEFAULT_VIBRATION_STEPS = 10;
@@ -17,6 +18,7 @@ interface DeviceStatus {
 	lastThresholdChange: Date,
 }
 interface Configuration {
+	serverAddress: string,
 	vibrationTimeout: number,
 	vibrationMax: number,
 	vibrationSteps: number,
@@ -31,6 +33,7 @@ var deviceStatus: Map<ButtplugClientDevice, DeviceStatus> = new Map();
 function fetchConfig(): Configuration {
 	const settings = vscode.workspace.getConfiguration("prohe");
 	const configObj: Configuration = {
+		serverAddress: settings.get('serverAddress', DEFAULT_SERVER_ADDRESS),
 		vibrationTimeout: settings.get('typingWindow', DEFAULT_VIBRATION_TIMEOUT),
 		vibrationMax: settings.get('vibrationMax', DEFAULT_VIBRATION_MAX),
 		vibrationSteps: settings.get('vibrationStages', DEFAULT_VIBRATION_STEPS),
@@ -131,12 +134,13 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	const connectCommand = vscode.commands.registerCommand('prohe.connect', () => {
 		vscode.window.setStatusBarMessage('PROHE: Attempting server connection...', MESSAGE_TIMEOUT);
+		let config = fetchConfig();
 		let potential = new ButtplugClient("PROHE");
-		const connector = new ButtplugNodeWebsocketClientConnector("ws://localhost:12345");
+		const connector = new ButtplugNodeWebsocketClientConnector(config.serverAddress);
 		potential.on("error", (err) => showError("server connection", err));
 		const connectionTimer = setTimeout(() => showError(
 			"server connection",
-			"connection timed out. Is Intiface Central running, and the server started?"
+			`Connection timed out. Is Intiface Central running, the server started, and the server running at ${config.serverAddress}?`
 		), CONNECTION_TIMEOUT);
 		try {
 			potential.connect(connector)

@@ -35,6 +35,7 @@ The extension leverages the Intiface platform to connect to your device and prov
 
 The following options are available for configuration:
 
+- `prohe.serverAddress`: The Intiface Central server address to connect to (typically of the form `ws://SERVER:PORT`)
 - `prohe.typingWindow`: Length of the gap in typing (in milliseconds) before vibration decreases by a stage
 - `prohe.vibrationMax`: The maximum vibration intensity that can be achieved
 - `prohe.vibrationStages`: The number of stages the vibration increases through
