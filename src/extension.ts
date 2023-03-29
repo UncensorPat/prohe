@@ -7,7 +7,7 @@ const DEFAULT_SERVER_ADDRESS = "ws://localhost:12345";
 const DEFAULT_VIBRATION_TIMEOUT = 5000;
 const DEFAULT_VIBRATION_MAX = 0.5;
 const DEFAULT_VIBRATION_STEPS = 10;
-const DEFUALT_VIBRATION_STEP_LENGTH = 10000;
+const DEFAULT_VIBRATION_STEP_LENGTH = 10000;
 
 const MESSAGE_TIMEOUT = 5000;
 const CONNECTION_TIMEOUT = 5000;
@@ -37,7 +37,7 @@ function fetchConfig(): Configuration {
 		vibrationTimeout: settings.get('typingWindow', DEFAULT_VIBRATION_TIMEOUT),
 		vibrationMax: settings.get('vibrationMax', DEFAULT_VIBRATION_MAX),
 		vibrationSteps: settings.get('vibrationStages', DEFAULT_VIBRATION_STEPS),
-		vibrationStepLength: settings.get('vibrationStageLength', DEFUALT_VIBRATION_STEP_LENGTH),
+		vibrationStepLength: settings.get('vibrationStageLength', DEFAULT_VIBRATION_STEP_LENGTH),
 		get vibrationStepSize() {
 			return this.vibrationMax / this.vibrationSteps;
 		},
