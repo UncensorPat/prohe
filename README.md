@@ -43,10 +43,6 @@ The following options are available for configuration:
 - `prohe.vibrationStageLength`: Duration (in milliseconds) of each stage of vibration
   - Longer stage length will mean a longer ramp up time to get to maximum vibration
 
-## Known Issues
-
-- Changes to the configuration require an extension restart before taking effect
-
 ## Support
 
 For any issues or questions, please visit the [PROHE GitHub repository](https://github.com/UncensorPat/prohe).
