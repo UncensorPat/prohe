@@ -3,10 +3,10 @@
 import * as vscode from 'vscode';
 import { ButtplugClient, ButtplugClientDevice, ButtplugNodeWebsocketClientConnector } from 'buttplug';
 
-const DEFAULT_VIBRATION_TIMEOUT = 5000
-const DEFAULT_VIBRATION_MAX = 0.5
-const DEFAULT_VIBRATION_STEPS = 10
-const DEFUALT_VIBRATION_STEP_LENGTH = 10000
+const DEFAULT_VIBRATION_TIMEOUT = 5000;
+const DEFAULT_VIBRATION_MAX = 0.5;
+const DEFAULT_VIBRATION_STEPS = 10;
+const DEFUALT_VIBRATION_STEP_LENGTH = 10000;
 
 const MESSAGE_TIMEOUT = 5000;
 const CONNECTION_TIMEOUT = 5000;
@@ -17,11 +17,11 @@ interface DeviceStatus {
 	lastThresholdChange: Date,
 }
 interface Configuration {
-	VIBRATION_TIMEOUT: number,
-	VIBRATION_MAX: number,
-	VIBRATION_STEPS: number,
-	VIBRATION_STEP_LENGTH: number
-	VIBRATION_STEP_SIZE: number
+	vibrationTimeout: number,
+	vibrationMax: number,
+	vibrationSteps: number,
+	vibrationStepLength: number
+	vibrationStepSize: number
 }
 
 var client: ButtplugClient | null = null;
@@ -30,16 +30,16 @@ var deviceStatus: Map<ButtplugClientDevice, DeviceStatus> = new Map();
 
 function fetchConfig(): Configuration {
 	const settings = vscode.workspace.getConfiguration("prohe");
-	const config_obj: Configuration = {
-		VIBRATION_TIMEOUT: settings.get('typingWindow', DEFAULT_VIBRATION_TIMEOUT),
-		VIBRATION_MAX: settings.get('vibrationMax', DEFAULT_VIBRATION_MAX),
-		VIBRATION_STEPS: settings.get('vibrationStages', DEFAULT_VIBRATION_STEPS),
-		VIBRATION_STEP_LENGTH: settings.get('vibrationStageLength', DEFUALT_VIBRATION_STEP_LENGTH),
-		get VIBRATION_STEP_SIZE() {
-			return this.VIBRATION_MAX / this.VIBRATION_STEPS;
+	const configObj: Configuration = {
+		vibrationTimeout: settings.get('typingWindow', DEFAULT_VIBRATION_TIMEOUT),
+		vibrationMax: settings.get('vibrationMax', DEFAULT_VIBRATION_MAX),
+		vibrationSteps: settings.get('vibrationStages', DEFAULT_VIBRATION_STEPS),
+		vibrationStepLength: settings.get('vibrationStageLength', DEFUALT_VIBRATION_STEP_LENGTH),
+		get vibrationStepSize() {
+			return this.vibrationMax / this.vibrationSteps;
 		},
 	};
-	return config_obj;
+	return configObj;
 }
 
 function updateDeviceList() {
@@ -65,12 +65,12 @@ function updateDeviceVibration(device: ButtplugClientDevice, touched: boolean) {
 		clearTimeout(status.timeout);
 		const oldLevel = status.level;
 		if (touched) {
-			if (status.level < config.VIBRATION_MAX && new Date().valueOf() - status.lastThresholdChange.valueOf() > config.VIBRATION_STEP_LENGTH) {
-				status.level = Math.min(status.level + config.VIBRATION_STEP_SIZE, config.VIBRATION_MAX);
+			if (status.level < config.vibrationMax && new Date().valueOf() - status.lastThresholdChange.valueOf() > config.vibrationStepLength) {
+				status.level = Math.min(status.level + config.vibrationStepSize, config.vibrationMax);
 				status.lastThresholdChange = new Date();
 			}
 		} else {
-			status.level -= config.VIBRATION_STEP_SIZE;
+			status.level -= config.vibrationStepSize;
 			if (status.level <= Number.EPSILON) {
 				stopDevice(device);
 				return;
@@ -78,11 +78,11 @@ function updateDeviceVibration(device: ButtplugClientDevice, touched: boolean) {
 			status.lastThresholdChange = new Date();
 		}
 
-		if (status.level > config.VIBRATION_MAX) {
-			status.level = config.VIBRATION_MAX
+		if (status.level > config.vibrationMax) {
+			status.level = config.vibrationMax
 		};
 
-		status.timeout = setTimeout(() => updateDeviceVibration(device, false), config.VIBRATION_TIMEOUT);
+		status.timeout = setTimeout(() => updateDeviceVibration(device, false), config.vibrationTimeout);
 		if (status.level !== oldLevel) {
 			console.debug(`Setting ${device.name} to ${status.level}`);
 			device.vibrate(status.level);
@@ -97,17 +97,17 @@ function updateDeviceVibration(device: ButtplugClientDevice, touched: boolean) {
 	}
 
 	// Create new
-	console.debug(`Starting vibrating ${device.name} at ${config.VIBRATION_STEP_SIZE}`);
+	console.debug(`Starting vibrating ${device.name} at ${config.vibrationStepSize}`);
 	deviceStatus.set(
 		device, {
-		level: config.VIBRATION_STEP_SIZE,
+		level: config.vibrationStepSize,
 		timeout: setTimeout(
 			() => updateDeviceVibration(device, false),
-			config.VIBRATION_TIMEOUT
+			config.vibrationTimeout
 		),
 		lastThresholdChange: new Date()
 	});
-	device.vibrate(config.VIBRATION_STEP_SIZE);
+	device.vibrate(config.vibrationStepSize);
 }
 
 function stopDevice(device: ButtplugClientDevice) {
